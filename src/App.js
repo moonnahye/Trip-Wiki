@@ -77,7 +77,20 @@ export default function App($app) {
       });
     },
   });
-  const regionList = new RegionList();
+  const regionList = new RegionList({$app, initialState:this.state.region,
+    handleRegion : async (region)=>{
+      history.pushState(null, null, `/${region}?sort=total`)
+      const cities = await request(0, region, 'total')
+      this.setState({
+        ...this.state,
+        startIndex: 0,
+        sortBy: 'total',
+        region: region,
+        searchWord : '',
+        cities: cities,
+      })
+    }});
+
   const cityList = new CityList({
     $app,
     initialState: this.state.cities,
@@ -108,7 +121,27 @@ export default function App($app) {
       sortBy: this.state.sortBy,
       searchWord: this.state.searchWord,
     });
+    regionList.setState(this.state.region);
   };
+
+  window.addEventListener('popstate',async ()=>{
+    const urlPath = window.location.pathname;
+
+    const prevRegion = urlPath.replace('/','');
+    const prevSortBy = getSortBy();
+    const prevSearchWord = getSearchWord();
+    const prevStartIdx = 0;
+    const prevCities = await request (prevStartIdx, prevRegion, prevSortBy, prevSearchWord);
+    
+    this.setState({
+      ...this.state,
+      startIndex: prevStartIdx,
+      sortBy: prevSortBy,
+      region: prevRegion,
+      searchWord: prevSearchWord,
+      cities: prevCities
+    });
+  });
 
   const init = async () => {
     const cities = await request(
