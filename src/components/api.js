@@ -9,10 +9,10 @@ export const request = async (startIdx, region, sortBy, searchWord) => {
       url += `?start=${startIdx}`;
     }
     if (sortBy) {
-      url += `?sort_by=${sortBy}`;
+      url += `&sort=${sortBy}`;
     }
     if (searchWord) {
-      url += `?search=${searchWord}`;
+      url += `&search=${searchWord}`;
     }
 
     const response = await fetch(url);
