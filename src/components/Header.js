@@ -13,11 +13,12 @@ export default function Header({
   $app.appendChild(this.$target);
 
   this.template = () => {
-    const { sortBy, searchWord } = this.state;
+    const { sortBy, searchWord, currentPage } = this.state;
     let temp = `<div class ="title">
     <a href="/">✈️ Trip Wiki</a>
-    </div>
-    <div class ="filter-search-container">
+    </div>`;
+    if(!currentPage.includes('/city/')){
+      temp += `<div class ="filter-search-container">
       <div class ="filter">
         <select id="sortList" class = "sort-list">
           <option value="total" ${sortBy ==='total'?'selected':''}>Total</option>
@@ -33,21 +34,26 @@ export default function Header({
         <input type="text" placeholder="Search" id="search" autocomplete="off" value=${searchWord}>
       </div>
     </div>`;
+    }
+    
 
     return temp; 
   };
 
   this.render = () => {
     this.$target.innerHTML = this.template();
-    document.getElementById('sortList').addEventListener('change',(event)=>{
-      this.handleSortChange(event.target.value);
-    })
-    const $searchInput = document.getElementById('search');
-    $searchInput.addEventListener('keydown',(event)=>{
-      if(event.key==='Enter'){
-      this.handleSearch($searchInput.value);
-      }
-    })
+    if(!this.state.currentPage.includes('/city/')){
+      document.getElementById('sortList').addEventListener('change',(event)=>{
+        this.handleSortChange(event.target.value);
+      });
+      const $searchInput = document.getElementById('search');
+      $searchInput.addEventListener('keydown',(event)=>{
+        if(event.key==='Enter'){
+          this.handleSearch($searchInput.value);
+        }
+      });
+    }
+    
 
   };
 

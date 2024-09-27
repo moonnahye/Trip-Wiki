@@ -3,7 +3,7 @@ import RegionList from "./components/RegionList.js";
 import CityList from "./components/CityList.js";
 import CityDetail from "./components/CityDetail.js";
 
-import { request } from "./components/api.js";
+import { request, requestCityDetail } from "./components/api.js";
 
 export default function App($app) {
 
@@ -35,6 +35,7 @@ export default function App($app) {
       initialState: {
         sortBy: this.state.sortBy,
         searchWord: this.state.searchWord,
+        currentPage: this.state.currentPage,
       },
       handleSortChange: async (sortBy) => {
         const pageUrl = `/${this.state.region}?sort=${sortBy}`;
@@ -129,8 +130,14 @@ export default function App($app) {
     });
   }
 
-  const renderCityDetail = () => {
-    new CityDetail();
+  const renderCityDetail = async (cityId) => {
+    try{
+      const cityDetailData = await requestCityDetail(cityId);
+      new CityDetail({$app, initialState: cityDetailData});
+    }catch(err){
+      console.log(err);
+    }
+    
   } 
 
   this.setState = (newState) => {
@@ -142,8 +149,9 @@ export default function App($app) {
     const path = this.state.currentPage;
     $app.innerHTML = '';
     if(path.startsWith('/city/')){
+      const cityId = path.split('/city/')[1];
       renderHeader();
-      renderCityDetail();
+      renderCityDetail(cityId);
     }else{
       renderHeader();
       renderRegionList();
@@ -187,7 +195,6 @@ export default function App($app) {
           cities: cities,
         })
     }
-    
   };
 
   init();
